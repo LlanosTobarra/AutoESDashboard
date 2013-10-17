@@ -1,0 +1,27 @@
+{
+  "name": "jsnetworkx",
+  "version": "0.2.0",
+  "description": "A port of the Python graph library NetworkX. For more info, visit http://networkx.github.com/.",
+  "keywords": [
+    "graph",
+    "science"
+  ],
+  "homepage": "http://felix-kling.de/JSNetworkX/",
+  "bugs": "https://github.com/fkling/JSNetworkX/issues",
+  "author": {
+    "name": "Felix Kling",
+    "email": "felix.kling@gmx.net",
+    "url": "http://felix-kling.de"
+  },
+  "files": [
+    "dist/jsnetworkx-node.js"
+  ],
+  "main": "dist/jsnetworkx-node.js",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.1.1",
+    "grunt-closure-tools": "~0.7.3",
+    "grunt-contrib-watch": "~0.3.1",
+    "mocha": "~1.9.0"
+  }
+}

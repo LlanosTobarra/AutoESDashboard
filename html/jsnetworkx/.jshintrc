@@ -1,0 +1,19 @@
+{
+    "globals": {
+        "jsnx": true,
+        "goog": true,
+        "BaseTestClass": true,
+        "expect": true
+    },
+
+    "curly": true,
+    "latedef": true,
+    "newcap": true,
+    "nonew": true,
+    "undef": true,
+    "strict": true,
+    "globalstrict": true,
+    "iterator": true,
+    "sub": true,
+    "browser": true
+}
