@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AutoEs DashBoard">
+    <meta name="author" content="">
+
+    <title>AutoES Faculty Dashboard</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="./libs/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+      <style>
+
+        .calendar {
+          font: 10px sans-serif;
+          shape-rendering: crispEdges;
+        }
+
+        .day {
+          fill: #fff;
+          stroke: #ccc;
+        }
+
+        .month {
+          fill: none;
+          stroke: #000;
+          stroke-width: 2px;
+        }
+
+        .RdYlGn .q0-11{fill:#fff}
+        .RdYlGn .q1-11{fill:rgb(5,105,225)}
+        .RdYlGn .q2-11{fill:rgb(0,206,209)}
+        .RdYlGn .q3-11{fill:rgb(255,215,0)}
+        .RdYlGn .q4-11{fill:rgb(210,105,30)}
+        .RdYlGn .q5-11{fill:rgb(26,152,80)}
+        .RdYlGn .q6-11{fill:#f00}
+        .RdYlGn .q7-11{fill:rgb(119,136,153)}
+        .RdYlGn .q8-11{fill:rgb(102,189,99)}
+        .RdYlGn .q9-11{fill:rgb(26,152,80)}
+        .RdYlGn .q10-11{fill:rgb(0,104,55)}
+
+       </style>
+        <script src="./libs/jquery-2.0.3.min.js"></script>
+        <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+        <script src="http://trifacta.github.io/vega/lib/d3.v3.min.js"></script>
+        <script src="http://trifacta.github.io/vega/lib/d3.geo.projection.min.js"></script>
+        <script src="http://trifacta.github.io/vega/vega.js"></script>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">AutoES</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li ><a href="Index.html">Home</a></li>
+            <li><a href="social.html">Student Social</a></li>
+            <li class="active"><a href="#">Student timeline</a></li>
+            <li><a href="metrics.html">Student Metrics</a></li>
+          </ul>
+        </div><!--/.navbar-collapse -->
+      </div>
+    </div>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h1>Timeline </h1>
+
+             <p> Select the user to visualize:  <select id="user">
+                                            </select>
+
+            </p>
+      </div>
+    </div>
+    
+    <div class="container">
+        <div id="calendar">
+              <p>
+                 <ul>Color Code:
+                     <li><font color="RoyalBlue"><b>Blue</b></font>: created event </li>
+                     <li><font color="Crimson"><b>Red</b></font>Red:failed event </li>
+                     <li><font color="MediumSeaGreen"><b>Green</b></font> successful evaluated event </li>
+                     <li><font color="LightSlateGrey"><b>Grey</b></font>: login event </li>
+                     <li><font color="Chocolate"><b>Yellow</b></font>: changed of activity event</li>
+                 </ul>
+             </p>
+           <script>
+     var width = 960,
+         height = 136,
+         cellSize = 17; // cell size
+
+     var day = d3.time.format("%w"),
+         week = d3.time.format("%U"),
+         percent = d3.format(".1%"),
+         format = d3.time.format("%Y-%m-%d");
+
+     var color = d3.scale.quantize()
+         .domain([0, 11])
+         .range(d3.range(11).map(function (d) { return "q" + d + "-11"; }));
+     var svg = d3.select("body").selectAll("svg")
+         .data(d3.range(2011, 2014))
+       .enter().append("svg")
+         .attr("width", width)
+         .attr("height", height)
+         .attr("class", "RdYlGn")
+       .append("g")
+         .attr("transform", "translate(" + ((width - cellSize * 53) / 2) + "," + (height - cellSize * 7 - 1) + ")");
+
+     svg.append("text")
+         .attr("transform", "translate(-6," + cellSize * 3.5 + ")rotate(-90)")
+         .style("text-anchor", "middle")
+         .text(function (d) { return d; });
+
+     var rect = svg.selectAll(".day")
+         .data(function (d) { return d3.time.days(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
+       .enter().append("rect")
+         .attr("class", "day")
+         .attr("width", cellSize)
+         .attr("height", cellSize)
+         .attr("x", function (d) { return week(d) * cellSize; })
+         .attr("y", function (d) { return day(d) * cellSize; })
+         .datum(format);
+
+     rect.append("title")
+         .text(function (d) { return d; });
+
+     svg.selectAll(".month")
+         .data(function (d) { return d3.time.months(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
+       .enter().append("path")
+         .attr("class", "month")
+         .attr("d", monthPath);
+
+     d3.csv("data/calendar.csv", function (error, csv) {
+         var data = d3.nest()
+         .key(function (d) { return d.Date; })
+         .rollup(function (d) {
+             var user = getUrlVars()['user'];
+             console.log(user);
+             if (d[0].User == 1) {
+                 console.log(d[0].Type)
+                 if (d[0].Type == "failed") return 6;
+                 else if (d[0].Type == "changed") return 5;
+                 else if (d[0].Type == "created") return 1;
+                 else if (d[0].Type == "message_init") return 2;
+                 else if (d[0].Type == "response_to") return 3;
+                 else if (d[0].Type == "added_to") return 4;
+
+                 else if (d[0].Type == "unchanged") return 7;
+                 else return 0;
+             }
+             else return 0;
+         })
+         .map(csv);
+
+         rect.filter(function (d) { return d in data; })
+           .attr("class", function (d) {
+               console.log(data[d] + ":" + color(data[d]));
+               return "day " + color(data[d]);
+           })
+         .select("title")
+           .text(function (d) {
+               switch (data[d]) {
+                   case 0: return d + ": unkonwn";
+                       break;
+                   case 1: return d + ": created";
+                       break;
+                   case 2: return d + ": message_init";
+                       break;
+                   case 3: return d + ": response_to";
+                       break;
+                   case 4: return d + ": added_to";
+                       break;
+                   case 5: return d + ": changed";
+                       break;
+                   case 6: return d + ": failed";
+                       break;
+                   case 7: return d + ": unchanged";
+                       break;
+                   default:
+                       return d + ": default";
+                       break;
+               }
+           });
+     });
+
+     function monthPath(t0) {
+         var t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0),
+           d0 = +day(t0), w0 = +week(t0),
+           d1 = +day(t1), w1 = +week(t1);
+         return "M" + (w0 + 1) * cellSize + "," + d0 * cellSize
+           + "H" + w0 * cellSize + "V" + 7 * cellSize
+           + "H" + w1 * cellSize + "V" + (d1 + 1) * cellSize
+           + "H" + (w1 + 1) * cellSize + "V" + 0
+           + "H" + (w0 + 1) * cellSize + "Z";
+     }
+     function getUrlVars() {
+         var vars = [], hash;
+         var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1);
+         console.log(hashes);
+         for (var i = 0; i < hashes.length; i++) {
+             hash = hashes[i].split('=');
+             vars.push(hash[0]);
+             vars[hash[0]] = hash[1];
+         }
+         return vars;
+     }
+     d3.select(self.frameElement).style("height", "2910px");
+
+    </script>
+            </div>
+     </div>
+
+      <hr>
+
+      <footer>
+        <p>&copy; SCC- UNED 2013</p>
+      </footer>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+     <script>
+            for (var i = 1; i < 64; i++) {
+                $('#user').append("<option value=" + i + ">" + i + "</option>");
+            }
+       </script>
+  
+  </body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AutoEs DashBoard">
+    <meta name="author" content="">
+
+    <title>AutoES Faculty Dashboard</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="./libs/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">AutoES</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="social.html">Student Social</a></li>
+            <li><a href="timeline.html">Student timeline</a></li>
+            <li><a href="metrics.html">Student Metrics</a></li>
+            </ul>
+        </div><!--/.navbar-collapse -->
+      </div>
+    </div>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h1>Dashboard </h1>
+        <p>This is a template for a simple marketing or informational website. It includes a large callout called the hero unit and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
+        <p><a class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+      </div>
+    </div>
+
+    <div class="container">
+        <select id="graph">
+            <option value="./data/events.json">All events</option>
+            <option value="./data/fails.json">Unsuccesfully evaluated events</option>
+            <option value="./data/success.json">Succesfully evaluated events</option>
+        </select>
+        <div id="vis"></div>
+
+     </div>
+
+      <hr>
+
+      <footer>
+        <p>&copy; SCC-UNED.2013</p>
+      </footer>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="./libs/jquery-2.0.3.min.js"></script>
+    <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="http://trifacta.github.io/vega/lib/d3.v3.min.js"></script>
+    <script src="http://trifacta.github.io/vega/lib/d3.geo.projection.min.js"></script>
+    <script src="http://trifacta.github.io/vega/vega.js"></script>
+    <script type="text/javascript">
+
+        // parse a spec and create a visualization view
+        function parse(spec) {
+            vg.parse.spec(spec, function (chart) { chart({ el: "#vis" }).update(); });
+        }
+        parse("./data/events.json");
+        $('#graph').change(function () {
+            parse($('#graph').val())
+        });
+     </script>
+
+  </body>
+</html>

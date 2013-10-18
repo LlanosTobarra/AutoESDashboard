@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AutoEs DashBoard">
+    <meta name="author" content="">
+
+    <title>AutoES Faculty Dashboard</title>
+    <script src="./libs/jquery-2.0.3.min.js"></script>
+    <link href="./libs/bootstrap/css/bootstrap.css" rel="stylesheet">
+     <style>
+      rect.bordered {
+        stroke: #E6E6E6;
+        stroke-width:2px;   
+      }
+
+      text.mono {
+        font-size: 9pt;
+        font-family: Consolas, courier;
+        fill: #aaa;
+      }
+
+      text.axis-workweek {
+        fill: #000;
+      }
+
+      text.axis-worktime {
+        fill: #000;
+      }
+    </style>
+    <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="http://trifacta.github.io/vega/lib/d3.v3.min.js"></script>
+    <script src="http://trifacta.github.io/vega/lib/d3.geo.projection.min.js"></script>
+    <script src="http://trifacta.github.io/vega/vega.js"></script>
+   
+
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">AutoES</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li ><a href="Index.html">Home</a></li>
+            <li><a href="social.html">Student Social</a></li>
+            <li><a href="timeline.html">Student timeline</a></li>
+            <li class="active"><a href="#">Student Metrics</a></li>
+          </ul>
+        </div><!--/.navbar-collapse -->
+      </div>
+    </div>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h1>Students metrics</h1>
+        <p>This is a template for a simple marketing or informational website. It includes a large callout called the hero unit and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
+        <p><a class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+      </div>
+    </div>
+
+    <div class="container">
+        <div id="chart"></div>
+        <script type="text/javascript">
+        var margin = { top: 50, right: 0, bottom: 100, left: 30 },
+            width = 960 - margin.left - margin.right,
+            height = 830 - margin.top - margin.bottom,
+            gridSize = Math.floor(width / 12),
+            legendElementWidth = gridSize * 0.75,
+            buckets = 6,
+            colors = ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"], // alternatively colorbrewer.YlGnBu[9]
+            user = ["1", "2", "3", "4", "5", "6", "7"],
+            parameter = ["Social", "Collaborative", "Learning", "Mood"];
+
+
+        d3.csv("data.txt", function (error, data) {
+            user = []
+            for (i = 0; i < data.length; i++) {
+                if(user.indexOf(data[i].user)<0) user.push(data[i].user);
+            }
+            
+            var colorScale = d3.scale.quantile()
+                //.domain([0, buckets - 1, d3.max(data, function (d) { return d.value; })])
+                .domain([0, buckets - 1, 10])
+                .range(colors);
+
+            var svg = d3.select("#chart").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            var userLabels = svg.selectAll(".userLabel")
+                .data(user)
+                .enter().append("text")
+                  .text(function (d) { return d; })
+                  .attr("x", 0)
+                  .attr("y", function (d, i) { return i * gridSize; })
+                  .style("text-anchor", "end")
+                  .attr("transform", "translate(-6," + gridSize / 1.5 + ")")
+                  .attr("class", function (d, i) { return ((i >= 0 && i <= 4) ? "dayLabel mono axis axis-workweek" : "dayLabel mono axis"); });
+
+            var parameterLabels = svg.selectAll(".parameterLabel")
+                .data(parameter)
+                .enter().append("text")
+                  .text(function (d) { return d; })
+                  .attr("x", function (d, i) { return i * gridSize; })
+                  .attr("y", 0)
+                  .style("text-anchor", "middle")
+                  .attr("transform", "translate(" + gridSize / 2 + ", -6)")
+                  .attr("class", function (d, i) { return ((i >= 7 && i <= 16) ? "timeLabel mono axis axis-worktime" : "timeLabel mono axis"); });
+
+            var heatMap = svg.selectAll(".parameter")
+                .data(data)
+                .enter().append("rect")
+                .attr("x", function (d) { return (d.parameter - 1) * gridSize; })
+                .attr("y", function (d) { return (d.user - 1) * gridSize; })
+                .attr("rx", 4)
+                .attr("ry", 4)
+                .attr("class", "hour bordered")
+                .attr("width", gridSize)
+                .attr("height", gridSize)
+                .style("fill", colors[0]);
+
+            heatMap.transition().duration(1000)
+                .style("fill", function (d) { return colorScale(d.value); });
+
+            heatMap.append("title").text(function (d) { return d.value; });
+
+            var legend = svg.selectAll(".legend")
+                .data([0].concat(colorScale.quantiles()), function (d) { return d; })
+                .enter().append("g")
+                .attr("class", "legend");
+
+            legend.append("rect")
+              .attr("x", function (d, i) { return legendElementWidth * i; })
+              .attr("y", height)
+              .attr("width", legendElementWidth)
+              .attr("height", gridSize / 2)
+              .style("fill", function (d, i) { return colors[i]; });
+
+            legend.append("text")
+              .attr("class", "mono")
+              .text(function (d) { return "= " + Math.round(d); })
+              .attr("x", function (d, i) { return legendElementWidth * i; })
+              .attr("y", height + gridSize);
+        });
+      </script>
+        
+  
+
+     </div>
+
+      <hr>
+
+      <footer>
+        <p>&copy; SCC-UNED.2013</p>
+      </footer>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+
+  </body>
+</html>

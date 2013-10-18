@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AutoEs DashBoard">
+    <meta name="author" content="">
+
+    <title>AutoES Faculty Dashboard: Social</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="./libs/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">AutoES</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li ><a href="Index.html">Home</a></li>
+            <li class="active"><a href="#">Student Social</a></li>
+            <li><a href="timeline.html">Student timeline</a></li>
+            <li><a href="metrics.html">Student Metrics</a></li>
+              </ul>
+        </div><!--/.navbar-collapse -->
+      </div>
+    </div>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h1>Social Network</h1>
+        <p>This social network is depicted under the relationship of "A has replied a message of B". Stronger colored nodes are those with a higher degree that those with a ligther colour.</p>
+        <p><a class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+      </div>
+    </div>
+
+    <div class="container">
+        <div id="net" style="height:500px"></div>
+
+     </div>
+
+      <hr>
+
+      <footer>
+        <p>&copy; Company 2013</p>
+      </footer>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="./libs/jquery-2.0.3.min.js"></script>
+    <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="http://trifacta.github.io/vega/lib/d3.v3.min.js"></script>
+    <script src="http://trifacta.github.io/vega/lib/d3.geo.projection.min.js"></script>
+    <script src="http://trifacta.github.io/vega/vega.js"></script>
+    <script src="./libs/jsnetworkx/jsnetworkx.js"></script>
+    <script type="text/javascript">
+
+        function draw_network(node_list, edge_list) {
+            // parse a spec and create a visualization view
+            var svg = d3.select("body").append("svg")
+                .attr("width", 1000)
+                .attr("height", 1000);
+
+            var G = jsnx.DiGraph();
+            G.add_nodes_from(node_list);
+            G.add_edges_from(edge_list);
+
+            // `jsnx.draw` accept a graph and configuration object
+           //var color = d3.scale.category20();
+            var color=d3.scale.linear().domain([0,60]).range(['#aec7e8','#393b79']);
+            jsnx.draw(G, {
+                element: '#net',
+                weighted: true,
+                layout_attr: {
+                    charge: -120,
+                    linkDistance: 20
+                },
+                node_attr: {
+                    r: 5,
+                    title: function (d) { return "{"+d.node+":"+G.degree(d.node)+"}" }
+                },
+                node_style: {
+                    fill: function (d) {
+                        console.log(G.degree(d.node));
+                        return color(G.degree(d.node));
+                    },
+                    stroke: 'none'
+                },
+                edge_style: {
+                    stroke: '#999'
+                }
+            }, true);
+        }
+
+        $.getJSON("data/network.json", function (data) {
+            draw_network(data.nodes, data.edges);
+        });
+    </script>
+  </body>
+</html>
