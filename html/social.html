@@ -37,7 +37,7 @@
           <ul class="nav navbar-nav">
             <li ><a href="Index.html">Home</a></li>
             <li class="active"><a href="#">Student Social</a></li>
-            <li><a href="timeline.html">Student timeline</a></li>
+            <li><a href="timeline.html">Student Timeline</a></li>
             <li><a href="metrics.html">Student Metrics</a></li>
               </ul>
         </div><!--/.navbar-collapse -->
@@ -48,7 +48,7 @@
     <div class="jumbotron">
       <div class="container">
         <h1>Social Network</h1>
-        <p>This social network is depicted under the relationship of "A has replied a message of B". Stronger colored nodes are those with a higher degree that those with a ligther colour.</p>
+        <p>This social network is depicted under the relationship of "A has replied a message of B". Stronger colored nodes are those with a higher degree than those with a ligther colour.</p>
         <p><a class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
       </div>
     </div>
@@ -61,7 +61,7 @@
       <hr>
 
       <footer>
-        <p>&copy; Company 2013</p>
+        <p>&copy; SCC-UNED 2013</p>
       </footer>
     </div> <!-- /container -->
 
@@ -88,8 +88,8 @@
             G.add_edges_from(edge_list);
 
             // `jsnx.draw` accept a graph and configuration object
-           //var color = d3.scale.category20();
-            var color=d3.scale.linear().domain([0,60]).range(['#aec7e8','#393b79']);
+            var color = d3.scale.category20();
+            //var color = d3.scale.linear().domain([0,10]).range(['#aec7e8', '#393b79']);
             jsnx.draw(G, {
                 element: '#net',
                 weighted: true,
@@ -98,13 +98,16 @@
                     linkDistance: 20
                 },
                 node_attr: {
-                    r: 5,
-                    title: function (d) { return "{"+d.node+":"+G.degree(d.node)+"}" }
+                    r: function (d) {
+                        console.log(G.degree(d.node));
+                        return (G.degree(d.node)/15 + 5);
+                    },
+                    title: function (d) { return "{" + d.node + ":" + G.degree(d.node) + "}" }
                 },
                 node_style: {
                     fill: function (d) {
-                        console.log(G.degree(d.node));
-                        return color(G.degree(d.node));
+                        console.log(d.data.group);
+                        return color(d.data.group);
                     },
                     stroke: 'none'
                 },
