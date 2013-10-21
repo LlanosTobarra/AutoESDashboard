@@ -60,7 +60,7 @@
           <ul class="nav navbar-nav">
             <li ><a href="Index.html">Home</a></li>
             <li><a href="social.html">Student Social</a></li>
-            <li><a href="timeline.html">Student timeline</a></li>
+            <li><a href="timeline.html">Student Timeline</a></li>
             <li class="active"><a href="#">Student Metrics</a></li>
           </ul>
         </div><!--/.navbar-collapse -->
@@ -70,14 +70,17 @@
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
       <div class="container">
-        <h1>Students metrics</h1>
-        <p>This is a template for a simple marketing or informational website. It includes a large callout called the hero unit and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
+        <h1>Students Metrics</h1>
+        <p>Each student metric goes ranked from navy blue which means is well ranked towards red, which means on risk.
+        </p>
+   
         <p><a class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
       </div>
     </div>
 
     <div class="container">
         <div id="chart"></div>
+<<<<<<< HEAD
         <script type="text/javascript">
             var margin = { top: 50, right: 0, bottom: 100, left: 30 },
                 width = 960 - margin.left - margin.right,
@@ -178,6 +181,94 @@
             });
       </script>
         
+=======
+       <script type="text/javascript">
+           var margin = { top: 50, right: 0, bottom: 100, left: 50 },
+               width = 2000 - margin.left - margin.right,
+               height = 3000 - margin.top - margin.bottom,
+               gridSize = Math.floor(width / 24),
+               legendElementWidth = gridSize * 0.75,
+               buckets = 9,
+               colors = ["#FA0808", "#FD4141","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#253494","#081d58"], 
+               user = ["1", "2"],
+               parameter = ["Hub", "Broker","Neighboors","Integration","On time","-Evaluation","+Evaluation"];
+
+
+           d3.csv("./data/data.csv",
+             function (error, data) {
+                 user = []
+                 for (i = 0; i < data.length; i++) { 
+                    if(user.indexOf(data[i].user)<0) user.push(data[i].user)
+                 }
+                 var colorScale = d3.scale.quantile()
+                   .domain([0, buckets - 1, 10])
+                   .range(colors);
+
+                 var svg = d3.select("#chart").append("svg")
+                   .attr("width", width + margin.left + margin.right)
+                   .attr("height", height + margin.top + margin.bottom)
+                   .append("g")
+                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                 var userLabels = svg.selectAll(".userLabel")
+                   .data(user)
+                   .enter().append("text")
+                     .text(function (d) { return d; })
+                     .attr("x", 0)
+                     .attr("y", function (d, i) { return i * gridSize; })
+                     .style("text-anchor", "end")
+                     .attr("transform", "translate(-6," + gridSize / 1.5 + ")")
+                     .attr("class", function (d, i) { return ((i >= 0 && i <= 4) ? "dayLabel mono axis axis-workweek" : "dayLabel mono axis"); });
+
+                 var parameterLabels = svg.selectAll(".parameterLabel")
+                   .data(parameter)
+                   .enter().append("text")
+                     .text(function (d) { return d; })
+                     .attr("x", function (d, i) { return i * gridSize; })
+                     .attr("y", 0)
+                     .style("text-anchor", "middle")
+                     .attr("transform", "translate(" + gridSize / 2 + ", -6)")
+                     .attr("class", function (d, i) { return ((i >= 7 && i <= 16) ? "timeLabel mono axis axis-worktime" : "timeLabel mono axis"); });
+
+                 var heatMap = svg.selectAll(".parameter")
+                   .data(data)
+                   .enter().append("rect")
+                   .attr("x", function (d) { return (d.parameter - 1) * gridSize; })
+                   .attr("y", function (d) { return (d.user - 1) * gridSize; })
+                   .attr("rx", 4)
+                   .attr("ry", 4)
+                   .attr("class", "hour bordered")
+                   .attr("width", gridSize)
+                   .attr("height", gridSize)
+                   .style("fill", colors[0]);
+
+                 heatMap.transition().duration(1000)
+                   .style("fill", function (d) { return colorScale(d.value); });
+
+                 heatMap.append("title").text(function (d) { return d.value; });
+
+                 var legend = svg.selectAll(".legend")
+                   .data([0].concat(colorScale.quantiles()), function (d) { return d; })
+                   .enter().append("g")
+                   .attr("class", "legend");
+
+                 legend.append("rect")
+                 .attr("x", function (d, i) { return legendElementWidth * i; })
+                 .attr("y", height)
+                 .attr("width", legendElementWidth)
+                 .attr("height", gridSize / 2)
+                 .style("fill", function (d, i) { return colors[i]; });
+
+                 legend.append("text")
+                 .attr("class", "mono")
+                 .text(function (d) { return "≥ " + Math.round(d); })
+                 .attr("x", function (d, i) { return legendElementWidth * i; })
+                 .attr("y", height + gridSize);
+             });
+    </script>
+  </body>
+</html>
+>>>>>>> 2ec7d42ffdc9fd32060f0cab4cdc0d57a15fe435
   
 
      </div>
@@ -185,7 +276,7 @@
       <hr>
 
       <footer>
-        <p>&copy; SCC-UNED.2013</p>
+        <p>&copy; SCC-UNED 2013</p>
       </footer>
     </div> <!-- /container -->
 

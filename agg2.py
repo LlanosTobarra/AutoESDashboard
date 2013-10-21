@@ -21,8 +21,8 @@ import vincent
 #######################################################################
 def user_aggregation():
     #Conexión a la base de datos MySQL
-    dashboard=db.mySQLConect("localhost","root","pfc2011","dashboard")
-    foros=db.mySQLConect("localhost","root","pfc2011","rita")
+    dashboard=db.mySQLConect("localhost","root","lego","dashboard")
+    foros=db.mySQLConect("localhost","root","lego","rita")
     #Lectura de los nodos de autoes
     nodos= psql.frame_query('select * from nodes;', dashboard.db)
     #Lectura de los usuarios de los foros
@@ -74,7 +74,7 @@ def event_aggregation(users):
     #Lista de eventos
     json_node_events=[]
     #conexión a la base de datos local
-    conexion=db.mySQLConect("localhost","root","pfc2011","dashboard")
+    conexion=db.mySQLConect("localhost","root","lego","dashboard")
     #events+reports
     query="SELECT dashboard.reports.id as report_id,dashboard.timeline_events.id as event_id, dashboard.reports.node_id,dashboard.reports.status, dashboard.reports.time FROM dashboard.reports,dashboard.timeline_events where timestampdiff(MINUTE,dashboard.timeline_events.updated_at,dashboard.reports.time)<=3 AND  dashboard.reports.time>=dashboard.timeline_events.updated_at AND node_id=subject_id AND event_type='updated';";
     er=psql.frame_query(query,conexion.db)
@@ -131,7 +131,7 @@ def event_aggregation(users):
 
 #############################################################################################################
 def message_aggregation(users,events):
-    foros=db.mySQLConect("localhost","root","pfc2011","rita")
+    foros=db.mySQLConect("localhost","root","lego","rita")
     msg= psql.frame_query('select * from message;', foros.db)
     list_messages=[]
     for idx, m in msg.iterrows():

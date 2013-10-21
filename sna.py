@@ -8,9 +8,10 @@ import json, io,db
 import networkx as nx
 from networkx.readwrite import json_graph
 from datetime import *
+import community
 #############################################################################################################
 def social_network():
-    foros=db.mySQLConect("localhost","root","pfc2011","rita")
+    foros=db.mySQLConect("localhost","root","lego","rita")
     msg= psql.frame_query('select * from message;', foros.db)
     edges=[]
 
@@ -24,14 +25,36 @@ def social_network():
             edges.append((sender,receiver))
         else:
             course='2012-2013'
-    wedges=[(x,y,{"weight": edges.count((x,y))}) for (x,y) in edges]
     graph=nx.DiGraph()
-    graph.add_edges_from(wedges)
-        
-    data=dict(nodes=graph.nodes(), edges=graph.edges())
+    for (x,y) in edges:
+        if graph.edges().count((x,y))==0:
+            graph.add_edge(x,y,weight= edges.count((x,y)))
+    
+    partition = community.best_partition(nx.Graph(graph))
+    for n in partition.keys():
+        graph.node[n]["group"]=partition[n]
+    return graph   
+#############################################################################################################
+def gen_network_json(graph):
+
+    data=dict(nodes=graph.nodes(data=True), edges=graph.edges(data=True))
     #data=json_graph.node_link_data(graph)
     with io.open('C:/Users/Llanos/Documents/GitHub/AutoESDashboard/html/data/network.json', 'w', encoding='utf-8') as f:
         f.write(unicode(json.dumps(data, ensure_ascii=False)))
+    
 #############################################################################################################
+def social_parameters():
+    g=social_network()
 
-social_network()
+
+    degree=DataFrame(nx.degree_centrality(g).values(),index=g.nodes(),columns=['degree'])
+    #closeness=DataFrame(nx.closeness_centrality(g,normalized=True).values(),index=g.nodes(),columns=['closeness'])
+    between=DataFrame(nx.betweenness_centrality(g,normalized=True).values(),index=g.nodes(),columns=['between'])
+    eigen=DataFrame(nx.eigenvector_centrality(g).values(),index=g.nodes(),columns=['eigen'])
+    clustering=DataFrame(nx.clustering(nx.Graph(g)).values(),index=g.nodes(),columns=['clustering'])
+
+    #data=pd.merge(degree,pd.merge(between,pd.merge(eigen,clustering)))
+    data=degree.join(between.join(eigen.join(clustering)))
+    return data
+############################################################################################################
+computed_social=social_parameters()
